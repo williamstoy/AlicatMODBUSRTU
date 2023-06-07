@@ -66,7 +66,6 @@
         private:
             HardwareSerial&     _serial;                            // Use a reference here, not a value
             ModbusInterface&    _modbus;                            // Use a reference here, not a value
-            bool                _connected;
             bool                _verbose;
             int                 _registerOffset;
             int                 _modbusID;
@@ -107,7 +106,6 @@
             void changeGasNumber(uint16_t gasTableIndex);
             void createCustomGasMixture(uint16_t gasMixtureIndex);
             void deleteCustomGasMixture(uint16_t gasMixtureIndex);
-            bool isConnected();
             void getDeviceStatisticRegisterAddress(int statisticIndex, int *registerAddress);
             void readSingleRegister(int registerAddress, uint16_t *registerValue);
             void readRegistersAsFloat(int registerAddress, float *floatValue);
@@ -120,6 +118,7 @@
             void getMixtureGasProperties(int mixtureIndex, uint16_t *gasIndex, float *gasPercent);
             void setGasNumber(uint16_t gasIndex);
             void tare(uint16_t tareArgument);
+            
             bool deviceIsMassFlow();
             bool deviceIsController();
             bool deviceIsPressureController();

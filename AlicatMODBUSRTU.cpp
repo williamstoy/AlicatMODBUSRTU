@@ -15,7 +15,6 @@ AlicatMODBUSRTU::AlicatMODBUSRTU(int modbusID, int deviceType, ModbusInterface& 
 : _modbusID(modbusID), _modbus(modbus), _serial(serial), _verbose(verbose), _deviceType(deviceType)
 {
   _registerOffset       = -1; // default register offset. Apparently this is a MODBUS Standard
-  _connected            = false;
 }
 
 
@@ -40,12 +39,6 @@ int AlicatMODBUSRTU::offsetRegister(int address) {
 
 
 
-bool AlicatMODBUSRTU::isConnected() {
-  return _connected;
-}
-
-
-
 void AlicatMODBUSRTU::getDeviceStatisticRegisterAddress(int statisticIndex, int *registerAddress) {
   if (statisticIndex < 1 || statisticIndex > 20) {
     if (_verbose) _serial.println("ERROR: function:'getDeviceStatisticRegisterAddress', argument statisticIndex is out of bounds");
@@ -66,14 +59,10 @@ void AlicatMODBUSRTU::readSingleRegister(int registerAddress, uint16_t *register
   uint16_t response[dataLength];
 
   if (!_modbus.readHoldingRegisterValues(_modbusID, offsetRegister(registerAddress), dataLength, response)) {
-      _connected = false;
-
       _serial.print("ERROR: Failed to read register: ");
       _serial.println(registerAddress);
       return;
   }
-
-  _connected = true;
 
   // concatenate the two response bytes into a single integer and return
   *registerValue = response[0]; // @todo: get rid of this (response[1] << 8) + response[0];
@@ -91,14 +80,10 @@ void AlicatMODBUSRTU::readRegistersAsFloat(int registerAddress, float *floatValu
   } floatValueUnion;
 
   if (!_modbus.readHoldingRegisterValues(_modbusID, offsetRegister(registerAddress), dataLength, response)) {
-      _connected = false;
-
       _serial.print("ERROR: Failed to read register: ");
       _serial.println(registerAddress);
       return;
   }
-
-  _connected = true;
 
   // concatenate the response bytes into a single float using the following format:
   // All 32-bit values are handled in consecutive Modbus registers in big-
