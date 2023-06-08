@@ -49,7 +49,7 @@
     #define SPECIAL_COMMAND_SAVE_CURRENT_SETPOINT_TO_MEMORY 12      // Controllers
     #define SPECIAL_COMMAND_CHANGE_LOOP_CONTROL_ALGORITHM   13      // Controllers
     #define SPECIAL_COMMAND_READ_PID_VALUE                  14      // Controllers
-    #define SPECIAL_COMMAND_CHANGE_Modbus_ID                32767   // All
+    #define SPECIAL_COMMAND_CHANGE_MODBUS_ID                32767   // All
 
     #define REGISTER_COMMAND_ID                             1000    // Access: Read/Write,  Devices: All
     #define REGISTER_COMMAND_ARGUMENT                       1001    // Access: Read/Write,  Devices: All
