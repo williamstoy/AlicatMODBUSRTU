@@ -35,7 +35,7 @@ All command and control requests to a Device are issued with Modbus function cod
 |-----------------------|----------|-----------|-----------------------|
 | Command ID            | 1000     | Read/Write| All                   |
 | Command Argument      | 1001     | Read/Write| All                   |
-| Setpoint              | 1010–1011| Read/Write| Controllers           |
+| Setpoint              | 1010–1011| Write     | Controllers           |
 | Mixture Gas 1 Index   | 1050     | Read/Write| Mass Flow             |
 | Mixture Gas 1 Percent | 1051     | Read/Write| Mass Flow             |
 | Mixture Gas 2 Index   | 1052     | Read/Write| Mass Flow             |
