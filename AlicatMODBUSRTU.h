@@ -117,7 +117,17 @@
             void getMixtureGasProperties(int mixtureIndex, uint16_t *gasIndex, float *gasPercent);
             void setGasNumber(uint16_t gasIndex);
             void tare(uint16_t tareArgument);
-
+            void resetTotalizerValue();
+            void valveSetting(uint16_t valveSettingArgument);
+            void displayLock(uint16_t displayLockArgument);
+            void changePinPIDLoop(uint16_t p);
+            void changeDinPIDLoop(uint16_t d);
+            void changeIinPIDLoop(uint16_t i);
+            void changeControlLoopVariable(uint16_t controlLoopVariableArgument);
+            void saveCurrentSetpointToMemory();
+            void changeLoopControlAlgorithm(uint16_t loopControlAlgorithmArgument);
+            void readPIDValue(uint16_t PIDValueArgument);
+            void changeModbusID(uint16_t modbusIDArgument);
             bool deviceIsMassFlow();
             bool deviceIsController();
             bool deviceIsPressureController();
