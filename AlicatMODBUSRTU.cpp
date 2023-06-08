@@ -1,10 +1,8 @@
 // reference: https://documents.alicat.com//manuals/DOC-MANUAL-MPL.pdf
-/*
-Sensor and process values are stored as big-endian, 32-bit
-IEEE-754 floating point numbers spanning two registers. Your
-control system will need to chain these into a single value to
-interpret them correctly.
-*/
+// also reference: https://documents.alicat.com/manuals/ModbusRTU_Manual.pdf
+
+
+
 #include <Arduino.h>
 #include <ModbusInterface.h>
 #include <AlicatMODBUSRTU.h>
@@ -16,6 +14,7 @@ AlicatMODBUSRTU::AlicatMODBUSRTU(int modbusID, int deviceType, ModbusInterface& 
 {
   _registerOffset       = -1; // default register offset. Apparently this is a MODBUS Standard
 }
+
 
 
 /** 
