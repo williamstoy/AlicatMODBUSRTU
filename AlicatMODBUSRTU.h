@@ -1,8 +1,8 @@
 // reference: https://documents.alicat.com//manuals/DOC-MANUAL-MPL.pdf
 // also reference: https://documents.alicat.com/manuals/ModbusRTU_Manual.pdf
 
-#ifndef AlicatMODBUSRTU_h
-    #define AlicatMODBUSRTU_h
+#ifndef AlicatModbusRTU_h
+    #define AlicatModbusRTU_h
     #include <Arduino.h>
     #include <ModbusInterface.h>
 
@@ -12,7 +12,6 @@
     #define DEVICE_TYPE_PSID_CONTROLLER                     3
     #define DEVICE_TYPE_GAUGE_PRESSURE_CONTROLLER           4                               
 
-    // @todo: not sure if I want to use an enum here
     #define STATUS_CODE_SUCCESS                             0       // All
     #define STATUS_CODE_INVALID_COMMAND_ID                  32769   // All
     #define STATUS_CODE_INVALID_SETTING                     32770   // All
@@ -50,7 +49,7 @@
     #define SPECIAL_COMMAND_SAVE_CURRENT_SETPOINT_TO_MEMORY 12      // Controllers
     #define SPECIAL_COMMAND_CHANGE_LOOP_CONTROL_ALGORITHM   13      // Controllers
     #define SPECIAL_COMMAND_READ_PID_VALUE                  14      // Controllers
-    #define SPECIAL_COMMAND_CHANGE_MODBUS_ID                32767   // All
+    #define SPECIAL_COMMAND_CHANGE_Modbus_ID                32767   // All
 
     #define REGISTER_COMMAND_ID                             1000    // Access: Read/Write,  Devices: All
     #define REGISTER_COMMAND_ARGUMENT                       1001    // Access: Read/Write,  Devices: All
@@ -62,7 +61,7 @@
     #define REGISTER_DEVICE_STATISTIC_1_VALUE               1203    // Access: Read,        Devices: All (All device statistic values, n, can be accessed by adding 2*(n-1) to this starting register value)
     #define REGISTER_MASS_FLOW                              1209    // Access: Read,        Devices: Mass Flow
 
-    class AlicatMODBUSRTU {
+    class AlicatModbusRTU {
         private:
             HardwareSerial&     _serial;                            // Use a reference here, not a value
             ModbusInterface&    _modbus;                            // Use a reference here, not a value
@@ -90,7 +89,7 @@
             } _status;
 
         public:
-                 AlicatMODBUSRTU(int modbusID, int deviceType, ModbusInterface& modbus, HardwareSerial& serial, bool verbose);
+                 AlicatModbusRTU(int modbusID, int deviceType, ModbusInterface& modbus, HardwareSerial& serial, bool verbose);
             void setRegisterOffset(int registerOffset);
             void setModbusID(int modbusID);
             int  offsetRegister(int address);
@@ -118,10 +117,11 @@
             void getMixtureGasProperties(int mixtureIndex, uint16_t *gasIndex, float *gasPercent);
             void setGasNumber(uint16_t gasIndex);
             void tare(uint16_t tareArgument);
-            
+
             bool deviceIsMassFlow();
             bool deviceIsController();
             bool deviceIsPressureController();
             bool deviceIsLiquid();
+            bool deviceIsPSIDController();
     };
 #endif

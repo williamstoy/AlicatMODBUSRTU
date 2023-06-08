@@ -5,14 +5,14 @@
 
 #include <Arduino.h>
 #include <ModbusInterface.h>
-#include <AlicatMODBUSRTU.h>
+#include <AlicatModbusRTU.h>
 
 
 
-AlicatMODBUSRTU::AlicatMODBUSRTU(int modbusID, int deviceType, ModbusInterface& modbus, HardwareSerial& serial, bool verbose) 
+AlicatModbusRTU::AlicatModbusRTU(int modbusID, int deviceType, ModbusInterface& modbus, HardwareSerial& serial, bool verbose) 
 : _modbusID(modbusID), _modbus(modbus), _serial(serial), _verbose(verbose), _deviceType(deviceType)
 {
-  _registerOffset       = -1; // default register offset. Apparently this is a MODBUS Standard
+  _registerOffset       = -1; // default register offset. Apparently this is a Modbus Standard
 }
 
 
@@ -20,25 +20,25 @@ AlicatMODBUSRTU::AlicatMODBUSRTU(int modbusID, int deviceType, ModbusInterface& 
 /** 
  * HELPER FUNCTIONS
 */
-void AlicatMODBUSRTU::setRegisterOffset(int registerOffset) {
+void AlicatModbusRTU::setRegisterOffset(int registerOffset) {
     _registerOffset = registerOffset;
 }
 
 
 
-void AlicatMODBUSRTU::setModbusID(int modbusID) {
+void AlicatModbusRTU::setModbusID(int modbusID) {
     _modbusID = modbusID;
 }
 
 
 
-int AlicatMODBUSRTU::offsetRegister(int address) {
+int AlicatModbusRTU::offsetRegister(int address) {
     return address + _registerOffset;
 }
 
 
 
-void AlicatMODBUSRTU::getDeviceStatisticRegisterAddress(int statisticIndex, int *registerAddress) {
+void AlicatModbusRTU::getDeviceStatisticRegisterAddress(int statisticIndex, int *registerAddress) {
   if (statisticIndex < 1 || statisticIndex > 20) {
     if (_verbose) _serial.println("ERROR: function:'getDeviceStatisticRegisterAddress', argument statisticIndex is out of bounds");
 
@@ -53,7 +53,7 @@ void AlicatMODBUSRTU::getDeviceStatisticRegisterAddress(int statisticIndex, int 
 /**
  * READ AND WRITE REGISTER FUNCTIONS
 */
-void AlicatMODBUSRTU::readSingleRegister(int registerAddress, uint16_t *registerValue) {
+void AlicatModbusRTU::readSingleRegister(int registerAddress, uint16_t *registerValue) {
   const int dataLength = 1;
   uint16_t response[dataLength];
 
@@ -69,7 +69,7 @@ void AlicatMODBUSRTU::readSingleRegister(int registerAddress, uint16_t *register
 
 
 
-void AlicatMODBUSRTU::readRegistersAsFloat(int registerAddress, float *floatValue) {
+void AlicatModbusRTU::readRegistersAsFloat(int registerAddress, float *floatValue) {
   const int dataLength = 2;
   uint16_t response[dataLength];
 
@@ -98,7 +98,7 @@ void AlicatMODBUSRTU::readRegistersAsFloat(int registerAddress, float *floatValu
 
 
 
-void AlicatMODBUSRTU::writeRegistersAsFloat(int registerAddress, float floatValue) {
+void AlicatModbusRTU::writeRegistersAsFloat(int registerAddress, float floatValue) {
   const int dataLength = 2;
   
   union {
@@ -118,7 +118,7 @@ void AlicatMODBUSRTU::writeRegistersAsFloat(int registerAddress, float floatValu
 
 
 
-void AlicatMODBUSRTU::writeSingleRegister(int registerAddress, uint16_t registerValue) {
+void AlicatModbusRTU::writeSingleRegister(int registerAddress, uint16_t registerValue) {
   const int dataLength = 1;
   uint16_t registerValueArray[dataLength] = { registerValue };
 
@@ -127,9 +127,9 @@ void AlicatMODBUSRTU::writeSingleRegister(int registerAddress, uint16_t register
 
 
 /**
- * MODBUS READING AND STATUS REGISTERS
+ * Modbus READING AND STATUS REGISTERS
 */
-void AlicatMODBUSRTU::setSetpoint(float setpoint) {
+void AlicatModbusRTU::setSetpoint(float setpoint) {
   if (!deviceIsController()) {
     if (_verbose) _serial.println("ERROR: function, 'setSetpoint' is not used for devices of this type");
 
@@ -141,7 +141,7 @@ void AlicatMODBUSRTU::setSetpoint(float setpoint) {
 
 
 
-void AlicatMODBUSRTU::getSetpoint(float *setPoint) {
+void AlicatModbusRTU::getSetpoint(float *setPoint) {
   if (!deviceIsController()) {
     if (_verbose) _serial.println("ERROR: function, 'setSetpoint' is not used for devices of this type");
 
@@ -161,7 +161,7 @@ void AlicatMODBUSRTU::getSetpoint(float *setPoint) {
 
 
 
-void AlicatMODBUSRTU::getPressure(float *pressure) {
+void AlicatModbusRTU::getPressure(float *pressure) {
   // all devices have a pressure statistic
 
   int registerAddress;
@@ -173,7 +173,7 @@ void AlicatMODBUSRTU::getPressure(float *pressure) {
 
 
 
-void AlicatMODBUSRTU::setMixtureGasProperties(int mixtureIndex, uint16_t gasIndex, float gasPercent) {
+void AlicatModbusRTU::setMixtureGasProperties(int mixtureIndex, uint16_t gasIndex, float gasPercent) {
   if (!deviceIsMassFlow()) {
     if (_verbose) _serial.println("ERROR: function, 'setMixtureGasProperties' is not used for devices of this type");
 
@@ -216,7 +216,7 @@ void AlicatMODBUSRTU::setMixtureGasProperties(int mixtureIndex, uint16_t gasInde
 
 
 
-void AlicatMODBUSRTU::getMixtureGasProperties(int mixtureIndex, uint16_t *gasIndex, float *gasPercent) {
+void AlicatModbusRTU::getMixtureGasProperties(int mixtureIndex, uint16_t *gasIndex, float *gasPercent) {
   if (!deviceIsMassFlow()) {
     if (_verbose) _serial.println("ERROR: function, 'getMixtureGasProperties' is not used for devices of this type");
 
@@ -245,7 +245,7 @@ void AlicatMODBUSRTU::getMixtureGasProperties(int mixtureIndex, uint16_t *gasInd
 
 
 
-void AlicatMODBUSRTU::setGasNumber(uint16_t gasIndex) {
+void AlicatModbusRTU::setGasNumber(uint16_t gasIndex) {
   if (!deviceIsMassFlow()) {
     if (_verbose) _serial.println("ERROR: function, 'setGasNumber' is not used for devices of this type");
 
@@ -264,7 +264,7 @@ void AlicatMODBUSRTU::setGasNumber(uint16_t gasIndex) {
 
 
 
-void AlicatMODBUSRTU::getGasNumber(uint16_t *gasIndex) {
+void AlicatModbusRTU::getGasNumber(uint16_t *gasIndex) {
   if (!deviceIsMassFlow()) {
     if (_verbose) _serial.println("ERROR: function, 'getGasNumber' is not used for devices of this type");
 
@@ -276,7 +276,7 @@ void AlicatMODBUSRTU::getGasNumber(uint16_t *gasIndex) {
 
 
 
-void AlicatMODBUSRTU::getStatusFlags() {
+void AlicatModbusRTU::getStatusFlags() {
     uint16_t status;
     readSingleRegister(REGISTER_DEVICE_STATUS, &status);
 
@@ -319,7 +319,7 @@ void AlicatMODBUSRTU::getStatusFlags() {
 
 
 
-void AlicatMODBUSRTU::getFlowTemperature(float *flowTemperature) {
+void AlicatModbusRTU::getFlowTemperature(float *flowTemperature) {
   if (!deviceIsMassFlow() && !deviceIsLiquid()) {
     if (_verbose) _serial.println("ERROR: function, 'getFlowTemperature' is not used for devices of this type");
 
@@ -335,7 +335,7 @@ void AlicatMODBUSRTU::getFlowTemperature(float *flowTemperature) {
 
 
 
-void AlicatMODBUSRTU::getVolumetricFlow(float *volumetricFlow) {
+void AlicatModbusRTU::getVolumetricFlow(float *volumetricFlow) {
   if (!deviceIsMassFlow() && !deviceIsLiquid()) {
     if (_verbose) _serial.println("ERROR: function, 'getVolumetricFlow' is not used for devices of this type");
 
@@ -351,7 +351,7 @@ void AlicatMODBUSRTU::getVolumetricFlow(float *volumetricFlow) {
 
 
 
-void AlicatMODBUSRTU::getMassFlow(float *massFlow) {
+void AlicatModbusRTU::getMassFlow(float *massFlow) {
   if (!deviceIsMassFlow()) {
     if (_verbose) _serial.println("ERROR: function, 'getMassFlow' is not used for devices of this type");
 
@@ -367,7 +367,7 @@ void AlicatMODBUSRTU::getMassFlow(float *massFlow) {
 
 
 
-void AlicatMODBUSRTU::getMassTotal(float *massTotal) {
+void AlicatModbusRTU::getMassTotal(float *massTotal) {
   if (!deviceIsMassFlow()) {
     if (_verbose) _serial.println("ERROR: function, 'getMassFlow' is not used for devices of this type");
 
@@ -390,7 +390,7 @@ void AlicatMODBUSRTU::getMassTotal(float *massTotal) {
 /**
  * SPECIAL COMMANDS
 */
-bool AlicatMODBUSRTU::sendSpecialCommand(uint16_t command, uint16_t argument) {
+bool AlicatModbusRTU::sendSpecialCommand(uint16_t command, uint16_t argument) {
   uint16_t data[2] = { command, argument };
 
   _modbus.writeHoldingRegisterValues(_modbusID, offsetRegister(REGISTER_COMMAND_ID), data, 2);
@@ -403,7 +403,7 @@ bool AlicatMODBUSRTU::sendSpecialCommand(uint16_t command, uint16_t argument) {
 
 
 
-bool AlicatMODBUSRTU::handleSpecialCommandStatusCode(uint16_t status) {  
+bool AlicatModbusRTU::handleSpecialCommandStatusCode(uint16_t status) {  
   switch(status) {
     case STATUS_CODE_SUCCESS:
       if (_verbose) _serial.println("SUCCESS: Special command status code returned 0");
@@ -437,98 +437,98 @@ bool AlicatMODBUSRTU::handleSpecialCommandStatusCode(uint16_t status) {
 
 
 
-void AlicatMODBUSRTU::readPIDValue(uint16_t coefficientID, uint16_t *coefficientValue) {
+void AlicatModbusRTU::readPIDValue(uint16_t coefficientID, uint16_t *coefficientValue) {
   readSingleRegister(REGISTER_COMMAND_ARGUMENT, coefficientValue);
 }
 
 
 
-void AlicatMODBUSRTU::changeGasNumber(uint16_t gasTableIndex) {
+void AlicatModbusRTU::changeGasNumber(uint16_t gasTableIndex) {
   sendSpecialCommand(SPECIAL_COMMAND_CHANGE_GAS_NUMBER, gasTableIndex);
 }
 
 
 
-void AlicatMODBUSRTU::createCustomGasMixture(uint16_t gasMixtureIndex) {
+void AlicatModbusRTU::createCustomGasMixture(uint16_t gasMixtureIndex) {
   sendSpecialCommand(SPECIAL_COMMAND_CREATE_CUSTOM_GAS_MIXTURE, gasMixtureIndex);
 }
 
 
 
-void AlicatMODBUSRTU::deleteCustomGasMixture(uint16_t gasMixtureIndex) {
+void AlicatModbusRTU::deleteCustomGasMixture(uint16_t gasMixtureIndex) {
   sendSpecialCommand(SPECIAL_COMMAND_DELETE_CUSTOM_GAS_MIXTURE, gasMixtureIndex);
 }
 
 
 
-void AlicatMODBUSRTU::tare(uint16_t tareArgument) {
+void AlicatModbusRTU::tare(uint16_t tareArgument) {
   sendSpecialCommand(SPECIAL_COMMAND_TARE, tareArgument);
 }
 
 
 
-void AlicatMODBUSRTU::resetTotalizerValue() {
+void AlicatModbusRTU::resetTotalizerValue() {
   sendSpecialCommand(SPECIAL_COMMAND_RESET_TOTALIZER_VALUE, 0);
 }
 
 
 
-void AlicatMODBUSRTU::valveSetting(uint16_t valveSettingArgument) {
+void AlicatModbusRTU::valveSetting(uint16_t valveSettingArgument) {
   sendSpecialCommand(SPECIAL_COMMAND_VALVE_SETTING, valveSettingArgument);
 }
 
 
 
-void AlicatMODBUSRTU::displayLock(uint16_t displayLockArgument) {
+void AlicatModbusRTU::displayLock(uint16_t displayLockArgument) {
   sendSpecialCommand(SPECIAL_COMMAND_DISPLAY_LOCK, displayLockArgument);
 }
 
 
 
-void AlicatMODBUSRTU::changePinPIDLoop(uint16_t p) {
+void AlicatModbusRTU::changePinPIDLoop(uint16_t p) {
   sendSpecialCommand(SPECIAL_COMMAND_CHANGE_P_IN_PID_LOOP, p);
 }
 
 
 
-void AlicatMODBUSRTU::changeDinPIDLoop(uint16_t d) {
+void AlicatModbusRTU::changeDinPIDLoop(uint16_t d) {
   sendSpecialCommand(SPECIAL_COMMAND_CHANGE_D_IN_PID_LOOP, d);
 }
 
 
 
-void AlicatMODBUSRTU::changeIinPIDLoop(uint16_t i) {
+void AlicatModbusRTU::changeIinPIDLoop(uint16_t i) {
   sendSpecialCommand(SPECIAL_COMMAND_CHANGE_I_IN_PID_LOOP, i);
 }
 
 
 
-void AlicatMODBUSRTU::changeControlLoopVariable(uint16_t controlLoopVariableArgument) {
+void AlicatModbusRTU::changeControlLoopVariable(uint16_t controlLoopVariableArgument) {
   sendSpecialCommand(SPECIAL_COMMAND_CHANGE_CONTROL_LOOP_VARIABLE, controlLoopVariableArgument);
 }
 
 
 
-void AlicatMODBUSRTU::saveCurrentSetpointToMemory() {
+void AlicatModbusRTU::saveCurrentSetpointToMemory() {
   sendSpecialCommand(SPECIAL_COMMAND_SAVE_CURRENT_SETPOINT_TO_MEMORY, 0);
 }
 
 
 
-void AlicatMODBUSRTU::changeLoopControlAlgorithm(uint16_t loopControlAlgorithmArgument) {
+void AlicatModbusRTU::changeLoopControlAlgorithm(uint16_t loopControlAlgorithmArgument) {
   sendSpecialCommand(SPECIAL_COMMAND_CHANGE_LOOP_CONTROL_ALGORITHM, loopControlAlgorithmArgument);
 }
 
 
 
-void AlicatMODBUSRTU::readPIDValue(uint16_t PIDValueArgument) {
+void AlicatModbusRTU::readPIDValue(uint16_t PIDValueArgument) {
   sendSpecialCommand(SPECIAL_COMMAND_READ_PID_VALUE, PIDValueArgument);
 }
 
 
 
-void AlicatMODBUSRTU::changeModbusID(uint16_t modbusIDArgument) {
-  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_MODBUS_ID, modbusIDArgument);
+void AlicatModbusRTU::changeModbusID(uint16_t modbusIDArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_Modbus_ID, modbusIDArgument);
 }
 
 
@@ -536,31 +536,31 @@ void AlicatMODBUSRTU::changeModbusID(uint16_t modbusIDArgument) {
 /**
  * DEVICE TYPE CHECK
 */
-bool AlicatMODBUSRTU::deviceIsMassFlow() {
+bool AlicatModbusRTU::deviceIsMassFlow() {
   return _deviceType == DEVICE_TYPE_MASS_FLOW_METER || _deviceType == DEVICE_TYPE_MASS_FLOW_CONTROLLER;
 }
 
 
 
-bool AlicatMODBUSRTU::deviceIsController() {
+bool AlicatModbusRTU::deviceIsController() {
   return _deviceType == DEVICE_TYPE_PSID_CONTROLLER || _deviceType == DEVICE_TYPE_GAUGE_PRESSURE_CONTROLLER || _deviceType == DEVICE_TYPE_MASS_FLOW_CONTROLLER;
 }
 
 
 
-bool AlicatMODBUSRTU::deviceIsPressureController() {
+bool AlicatModbusRTU::deviceIsPressureController() {
   return _deviceType == DEVICE_TYPE_PSID_CONTROLLER || _deviceType == DEVICE_TYPE_GAUGE_PRESSURE_CONTROLLER;
 }
 
 
 
-bool AlicatMODBUSRTU::deviceIsPSIDController() {
+bool AlicatModbusRTU::deviceIsPSIDController() {
   return _deviceType == DEVICE_TYPE_PSID_CONTROLLER;
 }
 
 
 
-bool AlicatMODBUSRTU::deviceIsLiquid() {
+bool AlicatModbusRTU::deviceIsLiquid() {
   return _deviceType == DEVICE_TYPE_LIQUID_CONTROLLER;
 }
 
