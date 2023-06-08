@@ -1,5 +1,7 @@
-// reference: https://documents.alicat.com//manuals/DOC-MANUAL-MPL.pdf
-// also reference: https://documents.alicat.com/manuals/ModbusRTU_Manual.pdf
+// REFERENCES
+
+// ./documents/DOC-MANUAL-MPL.pdf
+// ./documents/ModbusRTU_Manual.pdf
 
 
 
