@@ -528,7 +528,7 @@ void AlicatModbusRTU::readPIDValue(uint16_t PIDValueArgument) {
 
 
 void AlicatModbusRTU::changeModbusID(uint16_t modbusIDArgument) {
-  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_Modbus_ID, modbusIDArgument);
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_MODBUS_ID, modbusIDArgument);
 }
 
 
