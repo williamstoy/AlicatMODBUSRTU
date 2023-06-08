@@ -406,29 +406,29 @@ bool AlicatMODBUSRTU::sendSpecialCommand(uint16_t command, uint16_t argument) {
 bool AlicatMODBUSRTU::handleSpecialCommandStatusCode(uint16_t status) {  
   switch(status) {
     case STATUS_CODE_SUCCESS:
-      //_serial.println("SUCCESSFUL STATUS CODE RETURNED");
+      if (_verbose) _serial.println("SUCCESS: Special command status code returned 0");
       return true;
       break;
     case STATUS_CODE_INVALID_COMMAND_ID:
-      if (_verbose) _serial.println("ERROR: INVALID COMMAND ID");
+      if (_verbose) _serial.println("ERROR: Invalid command ID");
       break;
     case STATUS_CODE_INVALID_SETTING:
-      if (_verbose) _serial.println("ERROR: INVALID SETTING");
+      if (_verbose) _serial.println("ERROR: Invalid setting");
       break;
     case STATUS_CODE_REQUESTED_FEATURE_IS_UNSUPPORTED:
-      if (_verbose)  _serial.println("ERROR: REQUESTED FEATURE IS UNSUPPORTED");
+      if (_verbose)  _serial.println("ERROR: Requested feature is unsupported");
       break;
     case STATUS_CODE_INVALID_GAS_MIX_INDEX:
-      if (_verbose) _serial.println("ERROR: INVALID GAS MIX INDEX (MASS FLOW DEVICE)");
+      if (_verbose) _serial.println("ERROR: Invalid Gas Mix Index (Mass Flow Devices)");
       break;
     case STATUS_CODE_INVALID_GAS_MIX_CONSTITUENT:
-      if (_verbose) _serial.println("ERROR: INVALID GAS MIX CONSTITUENT (MASS FLOW DEVICE)");
+      if (_verbose) _serial.println("ERROR: Invalid Gas Mix Constituent (Mass Flow Devices)");
       break;
     case STATUS_CODE_INVALID_GAS_MIX_PERCENTAGE:
-      if (_verbose) _serial.println("ERROR: INVALID GAS MIX PERCENTAGE (MASS FLOW DEVICE)");
+      if (_verbose) _serial.println("ERROR: Invalid Gas Mix Percentage (Mass Flow Devices)");
       break;
     default:
-      if (_verbose) _serial.println("ERROR: UNKNOWN STATUS CODE");
+      if (_verbose) _serial.println("ERROR: Unknown status code");
       break;
   }
 
@@ -438,97 +438,97 @@ bool AlicatMODBUSRTU::handleSpecialCommandStatusCode(uint16_t status) {
 
 
 void AlicatMODBUSRTU::readPIDValue(uint16_t coefficientID, uint16_t *coefficientValue) {
-  if (!deviceIsController()) {
-    if (_verbose) _serial.println("ERROR: function, 'readPIDValue' is not used for devices of this type");
-
-    return;
-  }
-
-  if (coefficientID < 0 || coefficientID > 2) {
-    if (_verbose) _serial.println("ERROR: function:'readPIDValue', argument coefficientID is out of bounds");
-
-    return;
-  }
-
-  sendSpecialCommand(SPECIAL_COMMAND_READ_PID_VALUE, coefficientID);
-
   readSingleRegister(REGISTER_COMMAND_ARGUMENT, coefficientValue);
 }
 
 
 
 void AlicatMODBUSRTU::changeGasNumber(uint16_t gasTableIndex) {
-  if (!deviceIsMassFlow()) {
-    if (_verbose) _serial.println("ERROR: function, 'changeGasNumber' is not used for devices of this type");
-
-    return;
-  }
-
   sendSpecialCommand(SPECIAL_COMMAND_CHANGE_GAS_NUMBER, gasTableIndex);
 }
 
 
 
 void AlicatMODBUSRTU::createCustomGasMixture(uint16_t gasMixtureIndex) {
-  if (!deviceIsMassFlow()) {
-    if (_verbose) _serial.println("ERROR: function, 'createCustomGasMixture' is not used for devices of this type");
-    
-    return;
-  }
-
-  if (gasMixtureIndex != 0 && (gasMixtureIndex < 236 || gasMixtureIndex > 255)) {
-    if (_verbose) _serial.println("ERROR: function:'createCustomGasMixture', argument gasMixtureIndex is out of bounds");
-
-    return;
-  }
-
   sendSpecialCommand(SPECIAL_COMMAND_CREATE_CUSTOM_GAS_MIXTURE, gasMixtureIndex);
 }
 
 
 
 void AlicatMODBUSRTU::deleteCustomGasMixture(uint16_t gasMixtureIndex) {
-  if (!deviceIsMassFlow()) {
-    if (_verbose) _serial.println("ERROR: function, 'deleteCustomGasMixture' is not used for devices of this type");
-    
-    return;
-  }
-
   sendSpecialCommand(SPECIAL_COMMAND_DELETE_CUSTOM_GAS_MIXTURE, gasMixtureIndex);
 }
 
 
 
 void AlicatMODBUSRTU::tare(uint16_t tareArgument) {
-  bool proceed = true;
-
-  switch(tareArgument) {
-    case 0:
-      if(!deviceIsPressureController()) proceed = false;
-      break;
-    case 1:
-      if(!deviceIsPressureController()) proceed = false;
-      break;
-    case 2:
-      if(!deviceIsMassFlow() && !deviceIsLiquid()) proceed = false;
-      break;
-    default:
-      proceed = false;
-      break;
-  }
-
-  if (!proceed) {
-    if (_verbose) {
-      _serial.print("ERROR: Incorrect Tare Argument ");
-      _serial.print(tareArgument);
-      _serial.print(" for device of type");
-      _serial.println(_deviceType);
-    }
-
-    return;
-  }
-
   sendSpecialCommand(SPECIAL_COMMAND_TARE, tareArgument);
+}
+
+
+
+void AlicatMODBUSRTU::resetTotalizerValue() {
+  sendSpecialCommand(SPECIAL_COMMAND_RESET_TOTALIZER_VALUE, 0);
+}
+
+
+
+void AlicatMODBUSRTU::valveSetting(uint16_t valveSettingArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_VALVE_SETTING, valveSettingArgument);
+}
+
+
+
+void AlicatMODBUSRTU::displayLock(uint16_t displayLockArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_DISPLAY_LOCK, displayLockArgument);
+}
+
+
+
+void AlicatMODBUSRTU::changePinPIDLoop(uint16_t p) {
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_P_IN_PID_LOOP, p);
+}
+
+
+
+void AlicatMODBUSRTU::changeDinPIDLoop(uint16_t d) {
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_D_IN_PID_LOOP, d);
+}
+
+
+
+void AlicatMODBUSRTU::changeIinPIDLoop(uint16_t i) {
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_I_IN_PID_LOOP, i);
+}
+
+
+
+void AlicatMODBUSRTU::changeControlLoopVariable(uint16_t controlLoopVariableArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_CONTROL_LOOP_VARIABLE, controlLoopVariableArgument);
+}
+
+
+
+void AlicatMODBUSRTU::saveCurrentSetpointToMemory() {
+  sendSpecialCommand(SPECIAL_COMMAND_SAVE_CURRENT_SETPOINT_TO_MEMORY, 0);
+}
+
+
+
+void AlicatMODBUSRTU::changeLoopControlAlgorithm(uint16_t loopControlAlgorithmArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_LOOP_CONTROL_ALGORITHM, loopControlAlgorithmArgument);
+}
+
+
+
+void AlicatMODBUSRTU::readPIDValue(uint16_t PIDValueArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_READ_PID_VALUE, PIDValueArgument);
+}
+
+
+
+void AlicatMODBUSRTU::changeModbusID(uint16_t modbusIDArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_MODBUS_ID, modbusIDArgument);
 }
 
 
@@ -550,6 +550,12 @@ bool AlicatMODBUSRTU::deviceIsController() {
 
 bool AlicatMODBUSRTU::deviceIsPressureController() {
   return _deviceType == DEVICE_TYPE_PSID_CONTROLLER || _deviceType == DEVICE_TYPE_GAUGE_PRESSURE_CONTROLLER;
+}
+
+
+
+bool AlicatMODBUSRTU::deviceIsPSIDController() {
+  return _deviceType == DEVICE_TYPE_PSID_CONTROLLER;
 }
 
 
