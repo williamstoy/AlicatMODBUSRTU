@@ -1,5 +1,7 @@
-// reference: https://documents.alicat.com//manuals/DOC-MANUAL-MPL.pdf
-// also reference: https://documents.alicat.com/manuals/ModbusRTU_Manual.pdf
+// REFERENCES
+
+// ./documentation/DOC-MANUAL-MPL.pdf
+// ./documentation/ModbusRTU_Manual.pdf
 
 #ifndef AlicatModbusRTU_h
     #define AlicatModbusRTU_h
@@ -61,10 +63,35 @@
     #define REGISTER_DEVICE_STATISTIC_1_VALUE               1203    // Access: Read,        Devices: All (All device statistic values, n, can be accessed by adding 2*(n-1) to this starting register value)
     #define REGISTER_MASS_FLOW                              1209    // Access: Read,        Devices: Mass Flow
 
+    #define TARE_TYPE_PRESSURE                              0
+    #define TARE_TYPE_ABSOLUTE_PRESSURE                     1
+    #define TARE_TYPE_VOLUME                                2       // Only for Mass Flow and Liquid Devices
+
+    #define VALVE_SETTING_CANCEL                            0
+    #define VALVE_SETTING_HOLD_CLOSE                        1
+    #define VALVE_SETTING_HOLD_CURRENT                      2
+    #define VALVE_SETTING_EXHAUST                           3       // Dual valve controller devices only
+
+    #define DISPLAY_LOCK_UNLOCK                             0
+    #define DISPLAY_LOCK_LOCK                               1
+
+    #define CONTROL_LOOP_VARIABLE_MASS_FLOW                 0       // Only for Mass Flow Controllers
+    #define CONTROL_LOOP_VARIABLE_VOLUME_FLOW               1       // Only for Mass Flow and Liquid Controllers
+    #define CONTROL_LOOP_VARIABLE_DIFFERENTIAL_PRESSURE     2       // Only for PSID Controllers
+    #define CONTROL_LOOP_VARIABLE_ABSOLUTE_PRESSURE         3       // Only for Mass Flow and Absolute Pressure Controllers
+    #define CONTROL_LOOP_VARIABLE_GAUGE_PRESSURE            4       // Only for Mass Flow Controllers with a Barometer, Liquid Controllers, and Gauge Pressure Controllers
+
+    #define LOOP_CONTROL_ALGORITHM_PD                       1
+    #define LOOP_CONTROL_ALGORITHM_PDDI                     2
+
+    #define PID_VALUE_P                                     0
+    #define PID_VALUE_D                                     1
+    #define PID_VALUE_I                                     2
+
     class AlicatModbusRTU {
         private:
-            HardwareSerial&     _serial;                            // Use a reference here, not a value
-            ModbusInterface&    _modbus;                            // Use a reference here, not a value
+            HardwareSerial&     _serial;
+            ModbusInterface&    _modbus;
             bool                _verbose;
             int                 _registerOffset;
             int                 _modbusID;
@@ -117,13 +144,27 @@
             void getMixtureGasProperties(int mixtureIndex, uint16_t *gasIndex, float *gasPercent);
             void setGasNumber(uint16_t gasIndex);
             void tare(uint16_t tareArgument);
+            void tarePressure();
+            void tareAbsolutePressure();
+            void tareVolume();
             void resetTotalizerValue();
             void valveSetting(uint16_t valveSettingArgument);
+            void cancelValveSetting();
+            void holdValveClosed();
+            void holdValveCurrent();
+            void exhaustValve();
             void displayLock(uint16_t displayLockArgument);
+            void unlockDisplay();
+            void lockDisplay();
             void changePinPIDLoop(uint16_t p);
             void changeDinPIDLoop(uint16_t d);
             void changeIinPIDLoop(uint16_t i);
             void changeControlLoopVariable(uint16_t controlLoopVariableArgument);
+            void controlMassFlow();
+            void controlVolumetricFlow();
+            void controlDifferentialPressure();
+            void controlAbsolutePressure();
+            void controlGaugePressure();
             void saveCurrentSetpointToMemory();
             void changeLoopControlAlgorithm(uint16_t loopControlAlgorithmArgument);
             void readPIDValue(uint16_t PIDValueArgument);
