@@ -128,7 +128,6 @@
             void getMassTotal(float *massTotal);
             bool sendSpecialCommand(uint16_t command, uint16_t argument);
             bool handleSpecialCommandStatusCode(uint16_t statusCode);
-            void readPIDValue(uint16_t coefficientID, uint16_t *coefficientValue);
             void changeGasNumber(uint16_t gasTableIndex);
             void createCustomGasMixture(uint16_t gasMixtureIndex);
             void deleteCustomGasMixture(uint16_t gasMixtureIndex);
