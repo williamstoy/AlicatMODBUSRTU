@@ -168,6 +168,9 @@
             void saveCurrentSetpointToMemory();
             void changeLoopControlAlgorithm(uint16_t loopControlAlgorithmArgument);
             void readPIDValue(uint16_t PIDValueArgument);
+            void readPValue();
+            void readDValue();
+            void readIValue();
             void changeModbusID(uint16_t modbusIDArgument);
             bool deviceIsMassFlow();
             bool deviceIsController();

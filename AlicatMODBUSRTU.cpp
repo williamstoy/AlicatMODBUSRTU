@@ -22,18 +22,26 @@ AlicatModbusRTU::AlicatModbusRTU(int modbusID, int deviceType, ModbusInterface& 
 {
   _verbose = verbose;
 
+  if (deviceType != DEVICE_TYPE_MASS_FLOW_CONTROLLER &&
+      deviceType != DEVICE_TYPE_LIQUID_CONTROLLER &&
+      deviceType != DEVICE_TYPE_MASS_FLOW_METER &&
+      deviceType != DEVICE_TYPE_PSID_CONTROLLER &&
+      deviceType != DEVICE_TYPE_GAUGE_PRESSURE_CONTROLLER) {
+    if (_verbose) _serial.println("ERROR: function:'AlicatModbusRTU', argument deviceType is invalid");
+    // @todo: throw an error instead of returning
+
+    return;
+  }
+
+  if (_modbus.getRS485config() != SERIAL_8N1) {
+    if (_verbose) _serial.println("ERROR: function:'AlicatModbusRTU', argument modbus is invalid");
+
+    return;
+  }
+
   setModbusID(modbusID);
   setRegisterOffset(-1);
 }
-
-// @todo: check to make sure that the modbus interface is correct for Alicat Devices
-/*
-Baud Rate: 19200
-Data Bits: 8
-Stop Bits: 1
-Parity: None (This cannot be changed, per Alicat Engineers)
-Flow Control: None
-*/
 
 
 /** 
