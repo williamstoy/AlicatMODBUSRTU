@@ -28,16 +28,15 @@ AlicatModbusRTU::AlicatModbusRTU(int modbusID, int deviceType, ModbusInterface& 
       deviceType != DEVICE_TYPE_PSID_CONTROLLER &&
       deviceType != DEVICE_TYPE_GAUGE_PRESSURE_CONTROLLER) {
     if (_verbose) _serial.println("ERROR: function:'AlicatModbusRTU', argument deviceType is invalid");
-    // @todo: throw an error instead of returning
 
     return;
   }
 
-  if (_modbus.getRS485config() != SERIAL_8N1) {
+  /*if (_modbus.getRS485config() != SERIAL_8N1) {
     if (_verbose) _serial.println("ERROR: function:'AlicatModbusRTU', argument modbus is invalid");
 
     return;
-  }
+  }*/
 
   setModbusID(modbusID);
   setRegisterOffset(-1);
