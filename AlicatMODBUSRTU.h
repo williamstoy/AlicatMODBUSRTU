@@ -51,17 +51,84 @@
     #define SPECIAL_COMMAND_SAVE_CURRENT_SETPOINT_TO_MEMORY 12      // Controllers
     #define SPECIAL_COMMAND_CHANGE_LOOP_CONTROL_ALGORITHM   13      // Controllers
     #define SPECIAL_COMMAND_READ_PID_VALUE                  14      // Controllers
+    #define SPECIAL_COMMAND_VALVE_CONTROL_OVERRIDE          16      // Controllers
+    #define SPECIAL_COMMAND_CHANGE_SETPOINT_SOURCE          18      // Controllers
     #define SPECIAL_COMMAND_CHANGE_MODBUS_ID                32767   // All
+    #define SPECIAL_COMMAND_CHANGE_SERIAL_BAUD_RATE         32768   // All
 
     #define REGISTER_COMMAND_ID                             1000    // Access: Read/Write,  Devices: All
     #define REGISTER_COMMAND_ARGUMENT                       1001    // Access: Read/Write,  Devices: All
     #define REGISTER_SETPOINT                               1010    // Access: Write,       Devices: Controllers (MPL Manual says this is R/W, but it appears to be W only)
+    #define REGISTER_SETPOINT_2                             1012
+    #define REGISTER_BATCH_SIZE                             1015
+    #define REGISTER_DIRECT_VALVE_DRIVE                     1018
     #define REGISTER_MIXTURE_GAS_1_INDEX                    1050    // Access: Read/Write,  Devices: Mass Flow (All gas mixture indicies, n, can be accessed by adding 2*(n-1) to this starting register value)
     #define REGISTER_MIXTURE_GAS_1_PERCENT                  1051    // Access: Read/Write,  Devices: Mass Flow (All gas mixture percents, n, can be accessed by adding 2*(n-1)+1 to the starting register value of REGISTER_MIXTURE_GAS_1_INDEX)
+    #define REGISTER_SINGLE_EXPONENTIAL_FILTER_ALPHA_GAIN   1110
+    #define REGISTER_STP_DENSITY                            1112
+    #define REGISTER_PROPORTIONAL_GAIN                      1120
+    #define REGISTER_INTEGRAL_GAIN                          1122
+    #define REGISTER_DERIVATIVE_GAIN                        1124
+    #define REGISTER_VALVE_OFFSET                           1126
+    #define REGISTER_POWER_UP_SETPOINT                      1128
+    #define REGISTER_MASS_FLOW_UNITS                        1134
+    #define REGISTER_VOLUMETRIC_FLOW_UNITS                  1135
+    #define REGISTER_TOTALIZER_SELECT                       1137
+    #define REGISTER_TOTALIZER_UNITS                        1138
+    #define REGISTER_STP_TEMP                               1139
+    #define REGISTER_GAS_NUMBER                             1141
+    #define REGISTER_ANALOG_SCALE_FACTOR                    1142
+    #define REGISTER_STP_VOLUMETRIC_FLOW_UNITS              1144
     #define REGISTER_GAS_NUMBER                             1200    // Access: Read/Write,  Devices: Mass Flow
     #define REGISTER_DEVICE_STATUS                          1201    // Access: Read,        Devices: All
     #define REGISTER_DEVICE_STATISTIC_1_VALUE               1203    // Access: Read,        Devices: All (All device statistic values, n, can be accessed by adding 2*(n-1) to this starting register value)
     #define REGISTER_MASS_FLOW                              1209    // Access: Read,        Devices: Mass Flow
+
+    #define MASS_FLOW_UNIT_LB_PER_MINUTE                    26
+    #define MASS_FLOW_UNIT_LB_PER_HOUR                      25
+    #define MASS_FLOW_UNIT_OZ_PER_SECOND                    23
+    #define MASS_FLOW_UNIT_OZ_PER_MINUTE                    20
+    #define MASS_FLOW_UNIT_MG_PER_SECOND                    17
+    #define MASS_FLOW_UNIT_MG_PER_MINUTE                    14
+    #define MASS_FLOW_UNIT_KG_PER_SECOND                    11
+    #define MASS_FLOW_UNIT_KG_PER_MINUTE                    8
+    #define MASS_FLOW_UNIT_G_PER_SECOND                     5
+    #define MASS_FLOW_UNIT_G_PER_MINUTE                     2
+    #define MASS_FLOW_UNIT_G_PER_HOUR                       0
+
+
+    #define VOLUMETRIC_FLOW_UNIT_ML_PER_SECOND              29
+    #define VOLUMETRIC_FLOW_UNIT_L_PER_SECOND               28
+    #define VOLUMETRIC_FLOW_UNIT_L_PER_MINUTE               27
+    #define VOLUMETRIC_FLOW_UNIT_L_PER_HOUR                 0
+    #define VOLUMETRIC_FLOW_UNIT_GL_PER_MINUTE              25
+    #define VOLUMETRIC_FLOW_UNIT_GL_PER_HOUR                24
+    #define VOLUMETRIC_FLOW_UNIT_CM3_PER_SECOND             9
+    #define VOLUMETRIC_FLOW_UNIT_CM3_PER_MINUTE             8
+    #define VOLUMETRIC_FLOW_UNIT_CM3_PER_HOUR               7
+    #define VOLUMETRIC_FLOW_UNIT_M3_PER_MINUTE              16
+    #define VOLUMETRIC_FLOW_UNIT_M3_PER_HOUR                15
+    #define VOLUMETRIC_FLOW_UNIT_M3_PER_DAY                 14
+    #define VOLUMETRIC_FLOW_UNIT_IN3_PER_MINUTE             12
+    #define VOLUMETRIC_FLOW_UNIT_FT3_PER_MINUTE             10
+
+    #define TOTALIZER_UNIT_G                                0
+    #define TOTALIZER_UNIT_L                                0
+    #define TOTALIZER_UNIT_USTON                            27
+    #define TOTALIZER_UNIT_GALLON                           27
+    #define TOTALIZER_UNIT_MG                               11
+    #define TOTALIZER_UNIT_CM3                              11
+    #define TOTALIZER_UNIT_LB                               16
+    #define TOTALIZER_UNIT_M3                               16
+    #define TOTALIZER_UNIT_KG                               10
+    #define TOTALIZER_UNIT_OZ                               12
+    #define TOTALIZER_UNIT_IN3                              14
+    #define TOTALIZER_UNIT_FT3                              13
+    #define TOTALIZER_UNIT_ML                               34
+    #define TOTALIZER_UNIT_UL                               33
+
+    #define SETPOINT_SOURCE_DIGITAL                         0
+    #define SETPOINT_SOURCE_ANALOG                          1
 
     #define TARE_TYPE_PRESSURE                              0
     #define TARE_TYPE_ABSOLUTE_PRESSURE                     1
@@ -118,6 +185,7 @@
         public:
                  AlicatModbusRTU(int modbusID, int deviceType, ModbusInterface& modbus, HardwareSerial& serial, bool verbose);
             void setRegisterOffset(int registerOffset);
+            void setVerbose(bool verbose);
             void setModbusID(int modbusID);
             int  offsetRegister(int address);
             void getGasNumber(uint16_t *gasIndex);
@@ -125,7 +193,11 @@
             void getFlowTemperature(float *flowTemperature);
             void getVolumetricFlow(float *volumetricFlow);
             void getMassFlow(float *massFlow);
+            void getDensity(float *density);
             void getMassTotal(float *massTotal);
+            void setMassFlowUnits(uint16_t massFlowUnits);
+            void setVolumetricFlowUnis(uint16_t volumetricFlowUnits);
+            void setAnalogScaleFactor(float analogScaleFactor);
             bool sendSpecialCommand(uint16_t command, uint16_t argument);
             bool handleSpecialCommandStatusCode(uint16_t statusCode);
             void changeGasNumber(uint16_t gasTableIndex);
@@ -170,7 +242,12 @@
             void readPValue();
             void readDValue();
             void readIValue();
+            void valveControlOverride(uint16_t valveControlOverrideArgument);
+            void changeSetpointSource(uint16_t setpointSourceArgument);
+            void setSetPointSourceToDigital();
+            void setSetPointSourceToAnalog();
             void changeModbusID(uint16_t modbusIDArgument);
+            void changeSerialBaudRate(uint16_t serialBaudRateArgument);
             bool deviceIsMassFlow();
             bool deviceIsController();
             bool deviceIsPressureController();

@@ -55,6 +55,15 @@ void AlicatModbusRTU::setRegisterOffset(int registerOffset) {
 
 
 
+
+/// @brief Set the verbose flag of the Alicat device (All devices)
+/// @param verbose 
+void AlicatModbusRTU::setVerbose(bool verbose) {
+  _verbose = verbose;
+}
+
+
+
 /// @brief Set the Modbus ID of the Alicat device (All devices)
 /// @param modbusID Modbus ID of the Alicat device (0-247)
 void AlicatModbusRTU::setModbusID(int modbusID) {
@@ -455,6 +464,24 @@ void AlicatModbusRTU::getMassFlow(float *massFlow) {
 
 
 
+/// @brief Get the density reading from the Alicat device (Mass flow devices only)
+/// @param massFlow density reading, interpreted as an IEEE 32-bit float (kg/m^3)
+void AlicatModbusRTU::getDensity(float *density) {
+  if (!deviceIsMassFlow()) {
+    if (_verbose) _serial.println("ERROR: function, 'getDensity' is not used for devices of this type");
+
+    return;
+  }
+
+  int registerAddress;
+  
+  getDeviceStatisticRegisterAddress(1, &registerAddress);
+
+  readRegistersAsFloat(registerAddress, density);
+}
+
+
+
 /// @brief Get the total mass that has passed through the Alicat device (Mass flow devices only)
 /// @param massTotal total mass reading, interpreted as an IEEE 32-bit float
 void AlicatModbusRTU::getMassTotal(float *massTotal) {
@@ -473,6 +500,54 @@ void AlicatModbusRTU::getMassTotal(float *massTotal) {
   }
 
   readRegistersAsFloat(registerAddress, massTotal);
+}
+
+
+
+/// @brief Set the mass flow units of the Alicat device (Mass flow devices only)
+/// @param massFlowUnits desired mass flow units (see MASS_FLOW_UNITS_* constants)
+void AlicatModbusRTU::setMassFlowUnits(uint16_t massFlowUnits) {
+  if (!deviceIsMassFlow()) {
+    if (_verbose) _serial.println("ERROR: function, 'setMassFlowUnits' is not used for devices of this type");
+
+    return;
+  }
+
+  writeSingleRegister(REGISTER_MASS_FLOW_UNITS, massFlowUnits);
+}
+
+
+
+/// @brief Set the volumetric flow units of the Alicat device (Mass flow devices only)
+/// @param volumetricFlowUnits desired volumetric flow units (see VOLUMETRIC_FLOW_UNITS_* constants)
+void AlicatModbusRTU::setVolumetricFlowUnis(uint16_t volumetricFlowUnits) {
+  if (!deviceIsMassFlow()) {
+    if (_verbose) _serial.println("ERROR: function, 'setVolumetricFlowUnis' is not used for devices of this type");
+
+    return;
+  }
+
+  writeSingleRegister(REGISTER_VOLUMETRIC_FLOW_UNITS, volumetricFlowUnits);
+}
+
+
+
+/// @brief Set the analog scale factor of the Alicat device (Mass flow devices only)
+/// @param analogScaleFactor desired analog scale factor value (0.0-5.0)
+void AlicatModbusRTU::setAnalogScaleFactor(float analogScaleFactor) {
+  if (!deviceIsMassFlow()) {
+    if (_verbose) _serial.println("ERROR: function, 'setAnalogScaleFactor' is not used for devices of this type");
+
+    return;
+  }
+
+  if (analogScaleFactor < 0.0 || analogScaleFactor > 5.0) {
+    if (_verbose) _serial.println("ERROR: function, 'setAnalogScaleFactor', analogScaleFactor must be between 0 and 5");
+
+    return;
+  }
+
+  writeRegistersAsFloat(REGISTER_ANALOG_SCALE_FACTOR, analogScaleFactor);
 }
 
 
@@ -595,6 +670,7 @@ void AlicatModbusRTU::resetTotalizerValue() {
 
 
 
+// @todo: this may be only for pressure devices
 /// @brief Set the valve setting of the Alicat device (Controller devices only)
 /// @param valveSettingArgument valve position setting (see VALVE_SETTING_* constants)
 void AlicatModbusRTU::valveSetting(uint16_t valveSettingArgument) {
@@ -602,28 +678,28 @@ void AlicatModbusRTU::valveSetting(uint16_t valveSettingArgument) {
 }
 
 
-
+// @todo: this may be only for pressure devices
 /// @brief Cancel the valve setting (Controller devices only)
 void AlicatModbusRTU::cancelValveSetting() {
   valveSetting(VALVE_SETTING_CANCEL);
 }
 
 
-
+// @todo: this may be only for pressure devices
 /// @brief Hold the valve closed (Controller devices only)
 void AlicatModbusRTU::holdValveClosed() {
   valveSetting(VALVE_SETTING_HOLD_CLOSE);
 }
 
 
-
+// @todo: this may be only for pressure devices
 /// @brief Hold the current position of the valve (Controller devices only)
 void AlicatModbusRTU::holdValveCurrent() {
   valveSetting(VALVE_SETTING_HOLD_CURRENT);
 }
 
 
-
+// @todo: this may be only for pressure devices
 /// @brief Hold the exhaust valve open (Dual valve controller devices only)
 void AlicatModbusRTU::exhaustValve() {
   valveSetting(VALVE_SETTING_EXHAUST);
@@ -758,10 +834,50 @@ void AlicatModbusRTU::readIValue() {
 
 
 
+// @todo: define VALVE_CONTROL_OVERRIDE_* constants
+/// @brief Override the device valve control
+/// @param valveControlOverrideArgument valve control override (see VALVE_CONTROL_OVERRIDE_* constants)
+void AlicatModbusRTU::valveControlOverride(uint16_t valveControlOverrideArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_VALVE_CONTROL_OVERRIDE, valveControlOverrideArgument);
+}
+
+
+
+/// @brief Change the setpoint source of the Alicat device (Controller devices only)
+/// @param setpointSourceArgument setpoint source (see SETPOINT_SOURCE_* constants)
+void AlicatModbusRTU::changeSetpointSource(uint16_t setpointSourceArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_SETPOINT_SOURCE, setpointSourceArgument);
+}
+
+
+
+/// @brief Set the setpoint source to digital/serial (Controller devices only)
+void AlicatModbusRTU::setSetPointSourceToDigital() {
+  changeSetpointSource(SETPOINT_SOURCE_DIGITAL);
+}
+
+
+
+/// @brief Set the setpoint source to analog (Controller devices only)
+void AlicatModbusRTU::setSetPointSourceToAnalog() {
+  changeSetpointSource(SETPOINT_SOURCE_ANALOG);
+}
+
+
+
 /// @brief Change the Modbus ID of the Alicat device (All devices)
 /// @param modbusIDArgument desired Modbus ID of the Alicat device (0-247)
 void AlicatModbusRTU::changeModbusID(uint16_t modbusIDArgument) {
   sendSpecialCommand(SPECIAL_COMMAND_CHANGE_MODBUS_ID, modbusIDArgument);
+}
+
+
+
+
+/// @brief 
+/// @param serialBaudRateArgument 
+void AlicatModbusRTU::changeSerialBaudRate(uint16_t serialBaudRateArgument) {
+  sendSpecialCommand(SPECIAL_COMMAND_CHANGE_SERIAL_BAUD_RATE, serialBaudRateArgument);
 }
 
 
