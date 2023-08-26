@@ -520,7 +520,7 @@ void AlicatModbusRTU::setMassFlowUnits(uint16_t massFlowUnits) {
 
 /// @brief Set the volumetric flow units of the Alicat device (Mass flow devices only)
 /// @param volumetricFlowUnits desired volumetric flow units (see VOLUMETRIC_FLOW_UNITS_* constants)
-void AlicatModbusRTU::setVolumetricFlowUnis(uint16_t volumetricFlowUnits) {
+void AlicatModbusRTU::setVolumetricFlowUnits(uint16_t volumetricFlowUnits) {
   if (!deviceIsMassFlow()) {
     if (_verbose) _serial.println("ERROR: function, 'setVolumetricFlowUnis' is not used for devices of this type");
 

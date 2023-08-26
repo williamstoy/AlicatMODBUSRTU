@@ -196,7 +196,7 @@
             void getDensity(float *density);
             void getMassTotal(float *massTotal);
             void setMassFlowUnits(uint16_t massFlowUnits);
-            void setVolumetricFlowUnis(uint16_t volumetricFlowUnits);
+            void setVolumetricFlowUnits(uint16_t volumetricFlowUnits);
             void setAnalogScaleFactor(float analogScaleFactor);
             bool sendSpecialCommand(uint16_t command, uint16_t argument);
             bool handleSpecialCommandStatusCode(uint16_t statusCode);
